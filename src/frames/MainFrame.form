@@ -134,6 +134,9 @@
               <Dimension value="[150, 30]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConferenceActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnTrack">
           <Properties>
@@ -148,6 +151,9 @@
               <Dimension value="[150, 30]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnTrackActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnAuthor">
           <Properties>
@@ -159,6 +165,9 @@
               <Dimension value="[150, 30]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAuthorActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnPC_Member">
           <Properties>
@@ -171,6 +180,9 @@
               <Dimension value="[150, 30]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPC_MemberActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnReview">
           <Properties>
@@ -182,6 +194,9 @@
               <Dimension value="[150, 30]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnReviewActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnSubmission">
           <Properties>
@@ -193,6 +208,9 @@
               <Dimension value="[150, 30]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSubmissionActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnPaper">
           <Properties>
@@ -204,6 +222,9 @@
               <Dimension value="[150, 30]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPaperActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnBestPaperAward">
           <Properties>
@@ -215,6 +236,9 @@
               <Dimension value="[150, 30]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBestPaperAwardActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

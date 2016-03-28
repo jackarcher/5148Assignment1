@@ -5,17 +5,20 @@
  */
 package frames;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-
 /**
  *
  * @author Archer
  */
-public class MainFrame extends javax.swing.JFrame {
+public class MainFrame extends javax.swing.JFrame {// implements FunctionalInterface{
 
-    public static Connection conn;
-    
+    private final BasicFrame conference = new BasicFrame("Conference Frame");
+    private final BasicFrame track = new BasicFrame("Track Frame");
+    private final BasicFrame author = new BasicFrame("Author Frame");
+    private final BasicFrame PC_Member = new BasicFrame("PC member Frame");
+    private final BasicFrame review = new BasicFrame("Review Frame");
+    private final BasicFrame submission = new BasicFrame("Submission Frame");
+    private final BasicFrame paper = new BasicFrame("Paper Frame");
+    private final BasicFrame bestPaperAward = new BasicFrame("Best Paper Award Frame");
     /**
      * Creates new form MainFrame
      */
@@ -59,36 +62,76 @@ public class MainFrame extends javax.swing.JFrame {
         btnConference.setBounds(new java.awt.Rectangle(0, 0, 150, 30));
         btnConference.setPreferredSize(new java.awt.Dimension(150, 30));
         btnConference.setSize(new java.awt.Dimension(150, 30));
+        btnConference.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConferenceActionPerformed(evt);
+            }
+        });
 
         btnTrack.setText("Track");
         btnTrack.setBounds(new java.awt.Rectangle(0, 0, 150, 30));
         btnTrack.setPreferredSize(new java.awt.Dimension(150, 30));
         btnTrack.setSize(new java.awt.Dimension(150, 30));
+        btnTrack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTrackActionPerformed(evt);
+            }
+        });
 
         btnAuthor.setText("Author");
         btnAuthor.setPreferredSize(new java.awt.Dimension(150, 30));
         btnAuthor.setSize(new java.awt.Dimension(150, 30));
+        btnAuthor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAuthorActionPerformed(evt);
+            }
+        });
 
         btnPC_Member.setText("PC Member");
         btnPC_Member.setToolTipText("");
         btnPC_Member.setPreferredSize(new java.awt.Dimension(150, 30));
         btnPC_Member.setSize(new java.awt.Dimension(150, 30));
+        btnPC_Member.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPC_MemberActionPerformed(evt);
+            }
+        });
 
         btnReview.setText("Review");
         btnReview.setPreferredSize(new java.awt.Dimension(150, 30));
         btnReview.setSize(new java.awt.Dimension(150, 30));
+        btnReview.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReviewActionPerformed(evt);
+            }
+        });
 
         btnSubmission.setText("Submission");
         btnSubmission.setPreferredSize(new java.awt.Dimension(150, 30));
         btnSubmission.setSize(new java.awt.Dimension(150, 30));
+        btnSubmission.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSubmissionActionPerformed(evt);
+            }
+        });
 
         btnPaper.setText("Paper");
         btnPaper.setPreferredSize(new java.awt.Dimension(150, 30));
         btnPaper.setSize(new java.awt.Dimension(150, 30));
+        btnPaper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPaperActionPerformed(evt);
+            }
+        });
 
         btnBestPaperAward.setText("Best Paper Award");
         btnBestPaperAward.setPreferredSize(new java.awt.Dimension(150, 30));
         btnBestPaperAward.setSize(new java.awt.Dimension(150, 30));
+        btnBestPaperAward.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBestPaperAwardActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlButtonsLayout = new javax.swing.GroupLayout(pnlButtons);
         pnlButtons.setLayout(pnlButtonsLayout);
@@ -164,6 +207,46 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnConferenceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConferenceActionPerformed
+        // TODO add your handling code here:
+        conference.setVisible(!conference.isShowing());
+    }//GEN-LAST:event_btnConferenceActionPerformed
+
+    private void btnTrackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTrackActionPerformed
+        // TODO add your handling code here:
+        track.setVisible(!track.isShowing());
+    }//GEN-LAST:event_btnTrackActionPerformed
+
+    private void btnAuthorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAuthorActionPerformed
+        // TODO add your handling code here:
+        author.setVisible(!author.isShowing());
+    }//GEN-LAST:event_btnAuthorActionPerformed
+
+    private void btnPC_MemberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPC_MemberActionPerformed
+        // TODO add your handling code here:
+        PC_Member.setVisible(!PC_Member.isShowing());
+    }//GEN-LAST:event_btnPC_MemberActionPerformed
+
+    private void btnReviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReviewActionPerformed
+        // TODO add your handling code here:
+        review.setVisible(!review.isShowing());
+    }//GEN-LAST:event_btnReviewActionPerformed
+
+    private void btnSubmissionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmissionActionPerformed
+        // TODO add your handling code here:
+        submission.setVisible(!submission.isShowing());
+    }//GEN-LAST:event_btnSubmissionActionPerformed
+
+    private void btnPaperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPaperActionPerformed
+        // TODO add your handling code here:
+        paper.setVisible(!paper.isShowing());
+    }//GEN-LAST:event_btnPaperActionPerformed
+
+    private void btnBestPaperAwardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBestPaperAwardActionPerformed
+        // TODO add your handling code here:
+        bestPaperAward.setVisible(!bestPaperAward.isShowing());
+    }//GEN-LAST:event_btnBestPaperAwardActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -180,15 +263,11 @@ public class MainFrame extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+
         //</editor-fold>
 
         /* Create and display the form */
