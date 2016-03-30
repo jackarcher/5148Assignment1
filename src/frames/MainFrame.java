@@ -10,15 +10,15 @@ package frames;
  * @author Archer
  */
 public class MainFrame extends javax.swing.JFrame {// implements FunctionalInterface{
+    private final BasicFrame bestPaperAward = new BasicFrame("Best Paper Award");
 
-    private final BasicFrame conference = new BasicFrame("Conference Frame");
-    private final BasicFrame track = new BasicFrame("Track Frame");
-    private final BasicFrame author = new BasicFrame("Author Frame");
-    private final BasicFrame PC_Member = new BasicFrame("PC member Frame");
-    private final BasicFrame review = new BasicFrame("Review Frame");
-    private final BasicFrame submission = new BasicFrame("Submission Frame");
-    private final BasicFrame paper = new BasicFrame("Paper Frame");
-    private final BasicFrame bestPaperAward = new BasicFrame("Best Paper Award Frame");
+    private final BasicFrame conference = new BasicFrame("Conference");
+    private final BasicFrame track = new BasicFrame("Track");
+    private final BasicFrame author = new BasicFrame("Author");
+    private final BasicFrame PC_Member = new BasicFrame("PC member");
+    private final BasicFrame review = new BasicFrame("Review");
+    private final BasicFrame submission = new BasicFrame("Submission");
+    private final BasicFrame paper = new BasicFrame("Paper");
     /**
      * Creates new form MainFrame
      */
