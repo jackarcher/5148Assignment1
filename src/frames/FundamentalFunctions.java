@@ -15,7 +15,7 @@ package frames;
 public interface FundamentalFunctions {
 
     /**
-     * This method is to view all the records.
+     * This method is to view all the records if the 
      */
     public void view();
 

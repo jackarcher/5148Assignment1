@@ -94,8 +94,13 @@
     </Container>
     <Component class="javax.swing.JTextField" name="txtSearchWord">
       <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtSearchWordFocusGained"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtSearchWordFocusLost"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSearchWordActionPerformed"/>
       </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="txtSearchWord.setText(hint);"/>
+      </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btnSearch">
       <Properties>

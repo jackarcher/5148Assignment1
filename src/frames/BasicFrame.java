@@ -11,8 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Component;
-import java.util.HashMap;
-import java.util.LinkedList;
 import oracle.jdbc.OracleDriver;
 
 /**
@@ -25,74 +23,87 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     private final String DATABASE_B = "jdbc:oracle:thin:@hippo.its.monash.edu.au:1521:FIT5148b";
     private final String USERNAME = "S26298090";
     private final String PWD = "student";
+    private String hint;
     private final String dbName;
     private final String tableName;
-    private final String[] PKs;
+    private final String searchQuery;
     private final int PK_Number;
     private DefaultTableModel defaultTableModel;
 
     /**
      * Creates new form BasicFrame
      */
-    public BasicFrame(String title) {
-        setTitle(title + " Frame");
-        switch (title.toLowerCase()) {
+    public BasicFrame(String frameTitle) {
+        setTitle(frameTitle + " Frame");
+        switch (frameTitle.toLowerCase()) {
             case "conference":
                 dbName = DATABASE_A;
                 tableName = "CONFERENCE";
-                PKs = new String[]{"CONFERENCE_ID"};
                 PK_Number = 1;
+                searchQuery = "SELECT * FROM CONFERENCE WHERE CITY = ";
+                hint = "search conference by city";
                 break;
             case "track":
                 dbName = DATABASE_B;
                 tableName = "TRACK";
-                PKs = new String[]{"TRACK_ID"};
                 PK_Number = 1;
+                searchQuery = "SELECT * FROM CONFERENCE@FIT5148A C, TRACK T WHERE C.CONFERENCE_ID = T.CONFERENCE_ID AND C.CONFERENCE_NAME = ";
+                hint = "search track by conference name";
                 break;
             case "author":
                 dbName = DATABASE_B;
                 tableName = "AUTHOR";
-                PKs = new String[]{"AUTHOR_ID"};
                 PK_Number = 1;
+                searchQuery = "SELECT * FROM AUTHOR WHERE COUNTRY = ";
+                hint = "search author by country";
                 break;
             case "pc member":
                 dbName = DATABASE_B;
                 tableName = "PC_MEMBER";
-                PKs = new String[]{"PC_MEMBER_ID"};
                 PK_Number = 1;
+                searchQuery = "SELECT * FROM PC_MEMBER WHERE AFFILIATION = ";
+                hint = "search PC member by affiliation";
                 break;
             case "review":
                 dbName = DATABASE_B;
                 tableName = "REVIEW";
-                PKs = new String[]{"PC_MEMBER_ID", "PAPER_ID"};
                 PK_Number = 2;
+                searchQuery = "SELECT * FROM REVIEW WHERE RECOMMANDATION = ";
+                hint = "search review by recommandation";
                 break;
             case "submission":
                 dbName = DATABASE_B;
                 tableName = "SUBMISSION";
-                PKs = new String[]{"AUTHOR_ID", "PAPER_ID"};
                 PK_Number = 2;
+                searchQuery = "SELECT * FROM SUBMISSION S, PAPER P, TRACK T, CONFERENCE@FIT5148A C WHERE S.PAPER_ID = P.PAPER_ID AND P.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND C.CONFERENCE_NAME = ";
+                hint = "search submission by conference ???";
                 break;
             case "paper":
                 dbName = DATABASE_B;
                 tableName = "PAPER";
-                PKs = new String[]{"PAPER_ID"};
                 PK_Number = 1;
+                searchQuery = "SELECT * FROM PAPER P, TRACK T, CONFERENCE@FIT5148A C WHERE P.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND C.CONFERENCE_NAME = ";
+                hint = "search paper by conference ???";
                 break;
             case "best paper award":
                 dbName = DATABASE_B;
                 tableName = "BEST_PAPER_AWARD";
-                PKs = new String[]{"PAPER_ID", "TRACK_ID"};
                 PK_Number = 2;
+                searchQuery = "SELECT * FROM BEST_PAPER_AWARD B,TRACK T,CONFERENCE@FIT5148A C WHERE B.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND C.CONFERENCE_NAME = ";
+                hint = "search best paper award by conference ???";
                 break;
             default:
                 dbName = null;
                 tableName = null;
-                PKs = null;
                 PK_Number = 0;
+                searchQuery = null;
+                hint = null;
                 break;
         }
         initComponents();
+        getRootPane().setDefaultButton(btnRefresh);
+        btnRefresh.requestFocusInWindow();
+        setInfo("Load successfully");
     }
 
     /**
@@ -122,6 +133,15 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         tblContent.getTableHeader().setReorderingAllowed(false);
         scrContent.setViewportView(tblContent);
 
+        txtSearchWord.setText(hint);
+        txtSearchWord.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtSearchWordFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtSearchWordFocusLost(evt);
+            }
+        });
         txtSearchWord.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtSearchWordActionPerformed(evt);
@@ -246,7 +266,9 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }//GEN-LAST:event_btnUpdateActionPerformed
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
-        delete(getPKs());
+        if (delete(getPKs())) {
+            setInfo("Deleted successfully");
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void txtSearchWordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchWordActionPerformed
@@ -254,12 +276,34 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }//GEN-LAST:event_txtSearchWordActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        // TODO add your handling code here:
+        String keyword = txtSearchWord.getText();
+        if (keyword.isEmpty()) {
+            lblInfo.setForeground(Color.red);
+            lblInfo.setText("Please input a valid search key word.");
+        } else {
+            keyword = "\'" + keyword + "\'";
+            searchBy(keyword);
+        }
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
         view();
+        setInfo("Load successfully");
     }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void txtSearchWordFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSearchWordFocusLost
+        // TODO add your handling code here:
+        if (txtSearchWord.getText().isEmpty()) {
+            txtSearchWord.setText(hint);
+        }
+    }//GEN-LAST:event_txtSearchWordFocusLost
+
+    private void txtSearchWordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSearchWordFocusGained
+        // TODO add your handling code here:
+        if (txtSearchWord.getText().equalsIgnoreCase(hint)) {
+            txtSearchWord.setText(null);
+        }
+    }//GEN-LAST:event_txtSearchWordFocusGained
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDelete;
@@ -334,7 +378,6 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 }
                 defaultTableModel.addRow(rowData);
             }
-            setInfo("Load successfully");
             tblContent.setModel(defaultTableModel);
         } catch (SQLException e) {
             setErrorInfo(e);
@@ -392,7 +435,53 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
 
     @Override
     public void searchBy(String condition) {
-        return;
+        setInfo("Searching...");
+        Connection connection = null;
+        try {
+            //link to db
+            DriverManager.registerDriver(new OracleDriver());
+            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
+            System.out.println("Connceted to Oracle");
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(searchQuery + condition);
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+
+            //make headers
+            int columnCount = resultSetMetaData.getColumnCount();
+            Object[] headers = new Object[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                headers[i - 1] = resultSetMetaData.getColumnName(i);
+            }
+            defaultTableModel = new DefaultTableModel(headers, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            //make data
+            while (resultSet.next()) {
+                Object[] rowData = new Object[columnCount];
+                for (int i = 0; i < rowData.length; i++) {
+                    rowData[i] = resultSet.getObject(i + 1);
+                }
+                defaultTableModel.addRow(rowData);
+            }
+            tblContent.setModel(defaultTableModel);
+            setInfo("Search successfully");
+        } catch (SQLException e) {
+            setErrorInfo(e);
+            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                    System.out.println("Connection closed");
+                } catch (SQLException ex) {
+                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
 
     private void setInfo(String info) {
@@ -412,6 +501,9 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 break;
             case 20003:
                 lblInfo.setText("One corresponding author for each paper at max");
+                break;
+            case 17002:
+                lblInfo.setText("Connection error, please check your internet connection");
                 break;
             case 2292:
                 lblInfo.setText("Violation to the reference intergrity on delete");
