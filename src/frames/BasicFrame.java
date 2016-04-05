@@ -11,6 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Component;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import oracle.jdbc.OracleDriver;
 
 /**
@@ -29,6 +31,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     private final String searchQuery;
     private final int PK_Number;
     private DefaultTableModel defaultTableModel;
+    private Object[] headers;
 
     /**
      * Creates new form BasicFrame
@@ -40,56 +43,56 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 dbName = DATABASE_A;
                 tableName = "CONFERENCE";
                 PK_Number = 1;
-                searchQuery = "SELECT * FROM CONFERENCE WHERE CITY = ";
+                searchQuery = "SELECT * FROM CONFERENCE WHERE UPPER(CITY) = ";
                 hint = "search conference by city";
                 break;
             case "track":
                 dbName = DATABASE_B;
                 tableName = "TRACK";
                 PK_Number = 1;
-                searchQuery = "SELECT * FROM CONFERENCE@FIT5148A C, TRACK T WHERE C.CONFERENCE_ID = T.CONFERENCE_ID AND C.CONFERENCE_NAME = ";
+                searchQuery = "SELECT * FROM CONFERENCE@FIT5148A C, TRACK T WHERE C.CONFERENCE_ID = T.CONFERENCE_ID AND UPPER(C.CONFERENCE_NAME) = ";
                 hint = "search track by conference name";
                 break;
             case "author":
                 dbName = DATABASE_B;
                 tableName = "AUTHOR";
                 PK_Number = 1;
-                searchQuery = "SELECT * FROM AUTHOR WHERE COUNTRY = ";
+                searchQuery = "SELECT * FROM AUTHOR WHERE UPPER(COUNTRY) = ";
                 hint = "search author by country";
                 break;
             case "pc member":
                 dbName = DATABASE_B;
                 tableName = "PC_MEMBER";
                 PK_Number = 1;
-                searchQuery = "SELECT * FROM PC_MEMBER WHERE AFFILIATION = ";
+                searchQuery = "SELECT * FROM PC_MEMBER WHERE UPPER(AFFILIATION) = ";
                 hint = "search PC member by affiliation";
                 break;
             case "review":
                 dbName = DATABASE_B;
                 tableName = "REVIEW";
                 PK_Number = 2;
-                searchQuery = "SELECT * FROM REVIEW WHERE RECOMMANDATION = ";
-                hint = "search review by recommandation";
+                searchQuery = "SELECT * FROM REVIEW WHERE UPPER(RECOMMENDATION) = ";
+                hint = "search review by recommendation";
                 break;
             case "submission":
                 dbName = DATABASE_B;
                 tableName = "SUBMISSION";
                 PK_Number = 2;
-                searchQuery = "SELECT * FROM SUBMISSION S, PAPER P, TRACK T, CONFERENCE@FIT5148A C WHERE S.PAPER_ID = P.PAPER_ID AND P.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND C.CONFERENCE_NAME = ";
+                searchQuery = "SELECT * FROM SUBMISSION S, PAPER P, TRACK T, CONFERENCE@FIT5148A C WHERE S.PAPER_ID = P.PAPER_ID AND P.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND UPPER(C.CONFERENCE_NAME) = ";
                 hint = "search submission by conference ???";
                 break;
             case "paper":
                 dbName = DATABASE_B;
                 tableName = "PAPER";
                 PK_Number = 1;
-                searchQuery = "SELECT * FROM PAPER P, TRACK T, CONFERENCE@FIT5148A C WHERE P.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND C.CONFERENCE_NAME = ";
+                searchQuery = "SELECT * FROM PAPER P, TRACK T, CONFERENCE@FIT5148A C WHERE P.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND UPPER(C.CONFERENCE_NAME) = ";
                 hint = "search paper by conference ???";
                 break;
             case "best paper award":
                 dbName = DATABASE_B;
                 tableName = "BEST_PAPER_AWARD";
                 PK_Number = 2;
-                searchQuery = "SELECT * FROM BEST_PAPER_AWARD B,TRACK T,CONFERENCE@FIT5148A C WHERE B.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND C.CONFERENCE_NAME = ";
+                searchQuery = "SELECT * FROM BEST_PAPER_AWARD B,TRACK T,CONFERENCE@FIT5148A C WHERE B.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND UPPER(C.CONFERENCE_NAME) = ";
                 hint = "search best paper award by conference ???";
                 break;
             default:
@@ -117,7 +120,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
 
         scrContent = new javax.swing.JScrollPane();
         tblContent = new javax.swing.JTable();
-        txtSearchWord = new javax.swing.JTextField();
+        dynSearchWord = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
         pnlButtons = new javax.swing.JPanel();
         btnRefresh = new javax.swing.JButton();
@@ -133,18 +136,14 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         tblContent.getTableHeader().setReorderingAllowed(false);
         scrContent.setViewportView(tblContent);
 
-        txtSearchWord.setText(hint);
-        txtSearchWord.addFocusListener(new java.awt.event.FocusAdapter() {
+        dynSearchWord.setText(hint);
+        dynSearchWord.setForeground(Color.gray);
+        dynSearchWord.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                txtSearchWordFocusGained(evt);
+                dynSearchWordFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                txtSearchWordFocusLost(evt);
-            }
-        });
-        txtSearchWord.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtSearchWordActionPerformed(evt);
+                dynSearchWordFocusLost(evt);
             }
         });
 
@@ -227,7 +226,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(scrContent, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                            .addComponent(txtSearchWord, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE))
+                            .addComponent(dynSearchWord, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnSearch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -242,7 +241,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtSearchWord, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dynSearchWord, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -259,10 +258,36 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }// </editor-fold>//GEN-END:initComponents
     private void btnInsertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertActionPerformed
         // TODO add your handling code here:
-
+        InputDialog insertDialog = new InputDialog(this, "Insert for " + tableName, headers, PK_Number);
+        insertDialog.setVisible(true);
+        insertDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                insert(insertDialog.getValues());
+            }
+        });
+        view();
     }//GEN-LAST:event_btnInsertActionPerformed
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
         // TODO add your handling code here:
+
+        //find selected rows
+        int[] selectedRows = tblContent.getSelectedRows();
+        Object[][] subTable = new Object[selectedRows.length][tblContent.getColumnCount()];
+        for (int i = 0; i < selectedRows.length; i++) {
+            for (int j = 0; j < tblContent.getColumnCount(); j++) {
+                subTable[i][j] = tblContent.getValueAt(selectedRows[i], j);
+            }
+        }
+
+        InputDialog updateDialog = new InputDialog(this, "Update for " + tableName, headers, subTable);
+        updateDialog.setVisible(true);
+        updateDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+//                update(updateDialog.getValues());
+            }
+        });
     }//GEN-LAST:event_btnUpdateActionPerformed
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
@@ -271,17 +296,13 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
-    private void txtSearchWordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchWordActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtSearchWordActionPerformed
-
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        String keyword = txtSearchWord.getText();
+        String keyword = dynSearchWord.getText();
         if (keyword.isEmpty()) {
             lblInfo.setForeground(Color.red);
             lblInfo.setText("Please input a valid search key word.");
         } else {
-            keyword = "\'" + keyword + "\'";
+            keyword = "upper(\'" + keyword + "\')";
             searchBy(keyword);
         }
     }//GEN-LAST:event_btnSearchActionPerformed
@@ -291,19 +312,21 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         setInfo("Load successfully");
     }//GEN-LAST:event_btnRefreshActionPerformed
 
-    private void txtSearchWordFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSearchWordFocusLost
+    private void dynSearchWordFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dynSearchWordFocusLost
         // TODO add your handling code here:
-        if (txtSearchWord.getText().isEmpty()) {
-            txtSearchWord.setText(hint);
+        if (dynSearchWord.getText().isEmpty()) {
+            dynSearchWord.setForeground(Color.gray);
+            dynSearchWord.setText(hint);
         }
-    }//GEN-LAST:event_txtSearchWordFocusLost
+    }//GEN-LAST:event_dynSearchWordFocusLost
 
-    private void txtSearchWordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSearchWordFocusGained
+    private void dynSearchWordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dynSearchWordFocusGained
         // TODO add your handling code here:
-        if (txtSearchWord.getText().equalsIgnoreCase(hint)) {
-            txtSearchWord.setText(null);
+        if (dynSearchWord.getText().equalsIgnoreCase(hint)) {
+            dynSearchWord.setText(null);
+            dynSearchWord.setForeground(Color.black);
         }
-    }//GEN-LAST:event_txtSearchWordFocusGained
+    }//GEN-LAST:event_dynSearchWordFocusGained
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDelete;
@@ -311,11 +334,11 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUpdate;
+    private javax.swing.JTextField dynSearchWord;
     private javax.swing.JLabel lblInfo;
     private javax.swing.JPanel pnlButtons;
     private javax.swing.JScrollPane scrContent;
     private javax.swing.JTable tblContent;
-    private javax.swing.JTextField txtSearchWord;
     // End of variables declaration//GEN-END:variables
 
     public String getPKs() {
@@ -356,20 +379,19 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("select * from " + tableName);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-
             //make headers
             int columnCount = resultSetMetaData.getColumnCount();
-            Object[] headers = new Object[columnCount];
+            headers = new Object[columnCount];
             for (int i = 1; i <= columnCount; i++) {
                 headers[i - 1] = resultSetMetaData.getColumnName(i);
             }
             defaultTableModel = new DefaultTableModel(headers, 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
+//                    return row > getRowCount();
                     return false;
                 }
             };
-
             //make data
             while (resultSet.next()) {
                 Object[] rowData = new Object[columnCount];
@@ -379,6 +401,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 defaultTableModel.addRow(rowData);
             }
             tblContent.setModel(defaultTableModel);
+            System.out.println(tableName + " row no : " + defaultTableModel.getRowCount());
         } catch (SQLException e) {
             setErrorInfo(e);
             Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
@@ -395,13 +418,130 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }
 
     @Override
-    public boolean insert(String[] values, String[] columns) {
-        return true;
+    public void insert(String[] values) {
+        Connection connection = null;
+        try {
+            //link to db
+            DriverManager.registerDriver(new OracleDriver());
+            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
+            System.out.println("Connceted to Oracle");
+            Statement statement = connection.createStatement();
+            //prepare for generate sql
+            ResultSet resultSet = statement.executeQuery("select * from " + tableName);
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < values.length; i++) {
+                //append based on type
+                switch (resultSetMetaData.getColumnType(i + 1)) {
+                    case 2:
+                        //NUMERIC
+                        sb.append(values[i]);
+                        sb.append(",");
+                        break;
+                    case 12:
+                        //VARCHAR
+                        sb.append("'");
+                        sb.append(values[i]);
+                        sb.append("',");
+                        break;
+                    case 93:
+                        //DATE
+                        sb.append("TO_DATE('");
+                        sb.append(values[i]);
+                        sb.append("','yyyy-mm-dd'),");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            sb.delete(sb.lastIndexOf(","), sb.length());
+            String sql = "insert into " + tableName + " values(" + sb.toString() + ")";
+            statement.executeUpdate(sql);
+            System.out.println(sql);
+        } catch (SQLException e) {
+//            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
+            setErrorInfo(e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                    System.out.println("Connection closed");
+                } catch (SQLException ex) {
+                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
 
     @Override
-    public boolean update(String[] values, String[] columns, String condition) {
-        return true;
+    public void update(String[] values, String[] columns, String condition) {
+        // might be new parameters list
+        Object[][] data;
+
+        //try preparedStatement
+        PreparedStatement preparedUpdateStatement = null;
+
+        //generate the fixed part of the statement
+        StringBuffer updateSql = new StringBuffer("update " + tableName + " set ");
+        for (int i = 0;; i++) {
+            updateSql.append(tblContent.getColumnName(i));
+            updateSql.append(" = ?");
+            if (i == tblContent.getColumnCount() - 1) {
+                break;
+            }
+            updateSql.append(" ,");
+        }
+
+        Connection connection = null;
+        try {
+            //link to db
+            DriverManager.registerDriver(new OracleDriver());
+            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
+            System.out.println("Connceted to Oracle");
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("select * from " + tableName);
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+
+            connection.setAutoCommit(false);
+            //prepare statement
+            System.out.println("Prepared sql:" + updateSql.toString());
+            preparedUpdateStatement = connection.prepareStatement(updateSql.toString());
+
+            for (int i = 0; i < values.length; i++) {
+                switch (resultSetMetaData.getColumnType(i + 1)) {
+                    case 2:
+                        //NUMERIC
+
+                        break;
+                    case 12:
+                        //VARCHAR
+
+                        break;
+                    case 93:
+                        //DATE
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            String sql = "update " + tableName + " set " + " where ";
+            statement.executeUpdate("insert into " + tableName + " values(" + sb.toString() + ")");
+            System.out.println("executed sql:insert into " + tableName + " values(" + sb.toString() + ")");
+        } catch (SQLException e) {
+//            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
+            setErrorInfo(e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                    System.out.println("Connection closed");
+                } catch (SQLException ex) {
+                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
 
     @Override
@@ -506,10 +646,19 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 lblInfo.setText("Connection error, please check your internet connection");
                 break;
             case 2292:
-                lblInfo.setText("Violation to the reference intergrity on delete");
+                lblInfo.setText("Violate to the reference intergrity on delete");
+                break;
+            case 2290:
+                lblInfo.setText("Fail to pass the table intergrity check");
+                break;
+            case 1:
+                lblInfo.setText("Primary key or other unique check fail.");
+                break;
+            case 1400:
+                lblInfo.setText("Primary key or not null check fail.");
                 break;
             default:
-                lblInfo.setText("Something wrong, please try again latter.");
+                lblInfo.setText("Something wrong, please try again latter. Error code:" + e.getErrorCode());
                 break;
         }
     }

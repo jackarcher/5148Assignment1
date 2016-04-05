@@ -26,12 +26,8 @@ public interface FundamentalFunctions {
      * @param values The values that to be inserted. Must match the indicated
      * {@code columns} or the columns in the table, if the {@code columns} is
      * null.
-     * @param columns The names of columns that to be inserted. Being
-     * {@code null} indicates the insert operation does not specific the columns
-     * to be inserted.
-     * @return True if the insert operation successful
      */
-    public boolean insert(String[] values, String[] columns) throws Exception;
+    public void insert(String[] values);
 
     /**
      * This method is to update a record
@@ -46,7 +42,7 @@ public interface FundamentalFunctions {
      * indicated, excluded the word "where".
      * @return True if the insert operation successful
      */
-    public boolean update(String[] values, String[] columns, String condition);
+    public void update(String[] values, String[] columns, String condition);
 
     /**
      * This method is to delete the record(s) indicated by the @values
