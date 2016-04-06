@@ -113,11 +113,11 @@ public class InputDialog extends javax.swing.JDialog {
         return result;
     }
 
-    public Object[][] getUpdatedData() {
-        Object[][] updatedData = new String[tblContent.getRowCount()][tblContent.getColumnCount()];
+    public String[][] getUpdatedData() {
+        String[][] updatedData = new String[tblContent.getRowCount()][tblContent.getColumnCount()];
         for (int i = 0; i < updatedData.length; i++) {
             for (int j = 0; j < updatedData[0].length; j++) {
-                updatedData[i][j] = tblContent.getValueAt(i, j);
+                updatedData[i][j] = tblContent.getModel().getValueAt(i, j).toString();
             }
         }
         return updatedData;

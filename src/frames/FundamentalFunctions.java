@@ -33,7 +33,7 @@ public interface FundamentalFunctions {
      * This method is to update a record
      *
      */
-    public void update(Object[][] updatedData);
+    public void update(String[][] updatedData);
 
     /**
      * This method is to delete the record(s) indicated by the @values

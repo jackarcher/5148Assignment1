@@ -282,7 +282,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             }
         }
 
-        InputDialog updateDialog = new InputDialog(this, "Update for " + tableName, headers,PK_Number, subTable);
+        InputDialog updateDialog = new InputDialog(this, "Update for " + tableName, headers, PK_Number, subTable);
         updateDialog.setVisible(true);
         updateDialog.addWindowListener(new WindowAdapter() {
             @Override
@@ -290,12 +290,15 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 update(updateDialog.getUpdatedData());
             }
         });
+        view();
+        
     }//GEN-LAST:event_btnUpdateActionPerformed
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
         if (delete(getPKs())) {
             setInfo("Deleted successfully");
         }
+        view();
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
@@ -476,24 +479,27 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }
 
     @Override
-    public void update(Object[][] updatedData) {
+    public void update(String[][] updatedData) {
         //try preparedStatement
         PreparedStatement preparedUpdateStatement = null;
 
         //generate the fixed part of the statement
         StringBuffer updateSql = new StringBuffer("update " + tableName + " set ");
-        for (int i = 0;; i++) {
+        for (int i = PK_Number; i < tblContent.getColumnCount(); i++) {
             updateSql.append(tblContent.getColumnName(i));
             updateSql.append(" = ?");
-            if (i == tblContent.getColumnCount() - 1) {
-                break;
+            if (i != tblContent.getColumnCount() - 1) {
+                updateSql.append(" ,");
             }
-            updateSql.append(" ,");
         }
         updateSql.append(" where ");
-        updateSql.append(getPKs());
-        
-        System.out.println(updateSql.toString());
+        for (int i = 0; i < PK_Number; i++) {
+            updateSql.append(tblContent.getColumnName(i));
+            updateSql.append(" = ?");
+            if (i != PK_Number - 1) {
+                updateSql.append(" and ");
+            }
+        }
         Connection connection = null;
         try {
             //link to db
@@ -510,38 +516,67 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             preparedUpdateStatement = connection.prepareStatement(updateSql.toString());
             for (int i = 0; i < updatedData.length; i++) {
                 //set values for each row
-                for (int j = 0; j < updatedData[0].length; j++) {
-                    Object cellData = updatedData[i][j];
+                int setPosition = 1;
+                for (int j = PK_Number; j < updatedData[0].length; j++, setPosition++) {
+                    String cellData = updatedData[i][j];
                     switch (resultSetMetaData.getColumnType(j + 1)) {
                         case 2:
                             //NUMERIC
-                            preparedUpdateStatement.setBigDecimal(j, (BigDecimal)cellData);
+                            System.out.print("set " + setPosition + " numeric ");
+                            preparedUpdateStatement.setBigDecimal(setPosition, new BigDecimal(cellData));
                             break;
                         case 12:
                             //VARCHAR
-                            preparedUpdateStatement.setString(j, (String)cellData);
+                            System.out.print("set " + setPosition + " varchar ");
+                            preparedUpdateStatement.setString(setPosition, cellData);
                             break;
                         case 93:
                             //DATE
+                            System.out.print("set " + setPosition + " date ");
                             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                            preparedUpdateStatement.setDate(j, new java.sql.Date(df.parse((String)cellData).getTime()));
+                            preparedUpdateStatement.setDate(setPosition, new java.sql.Date(df.parse(cellData).getTime()));
                             break;
                         default:
                             break;
                     }
+                    System.out.print(cellData + " | ");
+                }
+                for (int j = 0; j < PK_Number; j++, setPosition++) {
+                    String cellData = updatedData[i][j];
+                    switch (resultSetMetaData.getColumnType(j + 1)) {
+                        case 2:
+                            //NUMERIC
+                            System.out.print("set " + setPosition + " numeric ");
+                            preparedUpdateStatement.setBigDecimal(setPosition, new BigDecimal(cellData));
+                            break;
+                        case 12:
+                            //VARCHAR
+                            System.out.print("set " + setPosition + " varchar ");
+                            preparedUpdateStatement.setString(setPosition, cellData);
+                            break;
+                        case 93:
+                            //DATE
+                            System.out.print("set " + setPosition + " date ");
+                            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                            preparedUpdateStatement.setDate(setPosition, new java.sql.Date(df.parse(cellData).getTime()));
+                            break;
+                        default:
+                            break;
+                    }
+                    System.out.print(cellData + " | ");
                 }
                 preparedUpdateStatement.executeUpdate();
-                connection.commit();
+                System.out.println();
             }
+            connection.commit();
             connection.setAutoCommit(true);
         } catch (SQLException e) {
-//            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
+            //            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
             setErrorInfo(e);
-            if(connection!=null){
-                try{
+            if (connection != null) {
+                try {
                     connection.rollback();
-                }
-                catch(SQLException ex){
+                } catch (SQLException ex) {
                     setErrorInfo(ex);
                 }
             }
@@ -571,7 +606,6 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             System.out.println("Connceted to Oracle");
             Statement statement = connection.createStatement();
             System.out.println(statement.executeUpdate("delete from " + tableName + " where " + condition));
-            view();
             return true;
         } catch (SQLException e) {
             //Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
@@ -677,6 +711,6 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 lblInfo.setText("Something wrong, please try again latter. Error code:" + e.getErrorCode());
                 break;
         }
-        System.err.println();
+        e.printStackTrace();
     }
 }
