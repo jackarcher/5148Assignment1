@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import oracle.jdbc.OracleDriver;
 
 /**
  *
@@ -37,14 +36,19 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     private DefaultTableModel defaultTableModel;
     private Object[] headers;
 
+    //might be temp use
+    private Connection connection;
+
     /**
      * Creates new form BasicFrame
      */
     public BasicFrame(String frameTitle) {
         setTitle(frameTitle + " Frame");
+        connection = MainFrame.CONNECTION_DB_B;
         switch (frameTitle.toLowerCase()) {
             case "conference":
                 dbName = DATABASE_A;
+                connection = MainFrame.CONNECTION_DB_A;
                 tableName = "CONFERENCE";
                 PK_Number = 1;
                 searchQuery = "SELECT * FROM CONFERENCE WHERE UPPER(CITY) = ";
@@ -83,21 +87,21 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 tableName = "SUBMISSION";
                 PK_Number = 2;
                 searchQuery = "SELECT * FROM SUBMISSION S, PAPER P, TRACK T, CONFERENCE@FIT5148A C WHERE S.PAPER_ID = P.PAPER_ID AND P.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND UPPER(C.CONFERENCE_NAME) = ";
-                hint = "search submission by conference ???";
+                hint = "search submission by conference name";
                 break;
             case "paper":
                 dbName = DATABASE_B;
                 tableName = "PAPER";
                 PK_Number = 1;
                 searchQuery = "SELECT * FROM PAPER P, TRACK T, CONFERENCE@FIT5148A C WHERE P.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND UPPER(C.CONFERENCE_NAME) = ";
-                hint = "search paper by conference ???";
+                hint = "search paper by conference name";
                 break;
             case "best paper award":
                 dbName = DATABASE_B;
                 tableName = "BEST_PAPER_AWARD";
                 PK_Number = 2;
                 searchQuery = "SELECT * FROM BEST_PAPER_AWARD B,TRACK T,CONFERENCE@FIT5148A C WHERE B.TRACK_ID = T.TRACK_ID AND T.CONFERENCE_ID = C.CONFERENCE_ID AND UPPER(C.CONFERENCE_NAME) = ";
-                hint = "search best paper award by conference ???";
+                hint = "search best paper award by conference name";
                 break;
             default:
                 dbName = null;
@@ -291,10 +295,11 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             }
         });
         view();
-        
+
     }//GEN-LAST:event_btnUpdateActionPerformed
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
+        setInfo("Deleteling...");
         if (delete(getPKs())) {
             setInfo("Deleted successfully");
         }
@@ -302,6 +307,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        setInfo("Searching...");
         String keyword = dynSearchWord.getText();
         if (keyword.isEmpty()) {
             lblInfo.setForeground(Color.red);
@@ -309,10 +315,12 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         } else {
             keyword = "upper(\'" + keyword + "\')";
             searchBy(keyword);
+            setInfo("Search finish");
         }
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        setInfo("Loading...");
         view();
         setInfo("Load successfully");
     }//GEN-LAST:event_btnRefreshActionPerformed
@@ -374,13 +382,12 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
 
     @Override
     public void view() {
-        setInfo("Loading...");
-        Connection connection = null;
+//        Connection connection = null;
         try {
             //link to db
-            DriverManager.registerDriver(new OracleDriver());
-            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
-            System.out.println("Connceted to Oracle");
+//            DriverManager.registerDriver(new OracleDriver());
+//            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
+//            System.out.println("Connceted to Oracle");
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("select * from " + tableName);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -410,26 +417,27 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         } catch (SQLException e) {
             setErrorInfo(e);
             Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                    System.out.println("Connection closed");
-                } catch (SQLException ex) {
-                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
+//        finally {
+//            if (connection != null) {
+//                try {
+//                    connection.close();
+//                    System.out.println("Connection closed");
+//                } catch (SQLException ex) {
+//                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
+//        }
     }
 
     @Override
     public void insert(String[] values) {
-        Connection connection = null;
+//        Connection connection = null;
         try {
             //link to db
-            DriverManager.registerDriver(new OracleDriver());
-            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
-            System.out.println("Connceted to Oracle");
+//            DriverManager.registerDriver(new OracleDriver());
+//            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
+//            System.out.println("Connceted to Oracle");
             Statement statement = connection.createStatement();
             //prepare for generate sql
             ResultSet resultSet = statement.executeQuery("select * from " + tableName);
@@ -466,16 +474,17 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         } catch (SQLException e) {
 //            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
             setErrorInfo(e);
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                    System.out.println("Connection closed");
-                } catch (SQLException ex) {
-                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
+//        finally {
+//            if (connection != null) {
+//                try {
+//                    connection.close();
+//                    System.out.println("Connection closed");
+//                } catch (SQLException ex) {
+//                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
+//        }
     }
 
     @Override
@@ -500,12 +509,12 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 updateSql.append(" and ");
             }
         }
-        Connection connection = null;
+//        Connection connection = null;
         try {
             //link to db
-            DriverManager.registerDriver(new OracleDriver());
-            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
-            System.out.println("Connceted to Oracle");
+//            DriverManager.registerDriver(new OracleDriver());
+//            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
+//            System.out.println("Connceted to Oracle");
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("select * from " + tableName);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -583,27 +592,27 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         } catch (ParseException ex) {
             //TODO
             Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                    System.out.println("Connection closed");
-                } catch (SQLException ex) {
-                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
+//        finally {
+//            if (connection != null) {
+//                try {
+//                    connection.close();
+//                    System.out.println("Connection closed");
+//                } catch (SQLException ex) {
+//                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
+//        }
     }
 
     @Override
     public boolean delete(String condition) {
-        setInfo("Deleteling...");
-        Connection connection = null;
+//        Connection connection = null;
         try {
             //link to db
-            DriverManager.registerDriver(new OracleDriver());
-            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
-            System.out.println("Connceted to Oracle");
+//            DriverManager.registerDriver(new OracleDriver());
+//            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
+//            System.out.println("Connceted to Oracle");
             Statement statement = connection.createStatement();
             System.out.println(statement.executeUpdate("delete from " + tableName + " where " + condition));
             return true;
@@ -611,27 +620,27 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             //Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
             setErrorInfo(e);
             return false;
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                    System.out.println("Connection closed");
-                } catch (SQLException ex) {
-                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
+//        finally {
+//            if (connection != null) {
+//                try {
+//                    connection.close();
+//                    System.out.println("Connection closed");
+//                } catch (SQLException ex) {
+//                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
+//        }
     }
 
     @Override
     public void searchBy(String condition) {
-        setInfo("Searching...");
-        Connection connection = null;
+//        Connection connection = null;
         try {
             //link to db
-            DriverManager.registerDriver(new OracleDriver());
-            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
-            System.out.println("Connceted to Oracle");
+//            DriverManager.registerDriver(new OracleDriver());
+//            connection = DriverManager.getConnection(dbName, USERNAME, PWD);
+//            System.out.println("Connceted to Oracle");
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(searchQuery + condition);
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -658,20 +667,20 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 defaultTableModel.addRow(rowData);
             }
             tblContent.setModel(defaultTableModel);
-            setInfo("Search successfully");
         } catch (SQLException e) {
             setErrorInfo(e);
             Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                    System.out.println("Connection closed");
-                } catch (SQLException ex) {
-                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
         }
+//        finally {
+//            if (connection != null) {
+//                try {
+//                    connection.close();
+//                    System.out.println("Connection closed");
+//                } catch (SQLException ex) {
+//                    Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
+//        }
     }
 
     private void setInfo(String info) {
@@ -707,10 +716,12 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             case 1400:
                 lblInfo.setText("Primary key or not null check fail.");
                 break;
+            case 12519:
+                System.exit(1);
+                break;
             default:
                 lblInfo.setText("Something wrong, please try again latter. Error code:" + e.getErrorCode());
                 break;
         }
-        e.printStackTrace();
     }
 }

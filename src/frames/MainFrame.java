@@ -5,6 +5,13 @@
  */
 package frames;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Archer
@@ -19,6 +26,35 @@ public class MainFrame extends javax.swing.JFrame {// implements FunctionalInter
     private final BasicFrame submission = new BasicFrame("Submission");
     private final BasicFrame paper = new BasicFrame("Paper");
     private final BasicFrame bestPaperAward = new BasicFrame("Best Paper Award");
+
+    //due to the DB server fail, chagne stratige, never release the connection
+    public static java.sql.Connection CONNECTION_DB_A = null;
+
+    public static java.sql.Connection CONNECTION_DB_B = null;
+
+    static {
+        try {
+            CONNECTION_DB_A = DriverManager.getConnection("jdbc:oracle:thin:@hippo.its.monash.edu.au:1521:FIT5148a", "S26298090", "student");
+            System.out.println("Connected to DB_A");
+            CONNECTION_DB_B = DriverManager.getConnection("jdbc:oracle:thin:@hippo.its.monash.edu.au:1521:FIT5148b", "S26298090", "student");
+            System.out.println("Connected to DB_B");
+        } catch (SQLException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                if (CONNECTION_DB_A != null) {
+                    CONNECTION_DB_A.close();
+                    System.out.println("Connection to DB_A closed");
+                }
+                if (CONNECTION_DB_B != null) {
+                    CONNECTION_DB_B.close();
+                    System.out.println("Connection to DB_B closed");
+                }
+            } catch (SQLException exx) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, exx);
+            }
+        }
+    }
+
     //test use only
 //    private final BasicFrame track = null;
 //    private final BasicFrame author = null;
@@ -27,12 +63,10 @@ public class MainFrame extends javax.swing.JFrame {// implements FunctionalInter
 //    private final BasicFrame submission = null;
 //    private final BasicFrame paper = null;
 //    private final BasicFrame bestPaperAward = null;
-
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
-        //conn = DriverManager.getConnection ("jdbc:oracle:thin:@hippo.its.monash.edu.au:1521:FIT5148a", "S26298090", "student");
         initComponents();
     }
 
@@ -282,7 +316,21 @@ public class MainFrame extends javax.swing.JFrame {// implements FunctionalInter
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainFrame().setVisible(true);
+                MainFrame mainFrame = new MainFrame();
+                mainFrame.setVisible(true);
+                mainFrame.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        try {
+                            CONNECTION_DB_A.close();
+                            System.out.println("Connection to DB_A closed");
+                            CONNECTION_DB_B.close();
+                            System.out.println("Connection to DB_B closed");
+                        } catch (SQLException ex) {
+                            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
             }
         });
     }
