@@ -271,10 +271,13 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         insertDialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                insert(insertDialog.getValues());
+                setInfo("Inserting...");
+                if (insert(insertDialog.getValues())) {
+                    view();
+                    setInfo("Inserted successful");
+                }
             }
         });
-        view();
     }//GEN-LAST:event_btnInsertActionPerformed
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
         //find selected rows
@@ -291,10 +294,13 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         updateDialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                update(updateDialog.getUpdatedData());
+                setInfo("Updating...");
+                if (update(updateDialog.getUpdatedData())) {
+                    view();
+                    setInfo("Updated successful");
+                }
             }
         });
-        view();
 
     }//GEN-LAST:event_btnUpdateActionPerformed
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
@@ -431,7 +437,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }
 
     @Override
-    public void insert(String[] values) {
+    public boolean insert(String[] values) {
 //        Connection connection = null;
         try {
             //link to db
@@ -471,9 +477,12 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             String sql = "insert into " + tableName + " values(" + sb.toString() + ")";
             statement.executeUpdate(sql);
             System.out.println(sql);
+            statement.close();
+            return true;
         } catch (SQLException e) {
 //            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
             setErrorInfo(e);
+            return false;
         }
 //        finally {
 //            if (connection != null) {
@@ -488,7 +497,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }
 
     @Override
-    public void update(String[][] updatedData) {
+    public boolean update(String[][] updatedData) {
         //try preparedStatement
         PreparedStatement preparedUpdateStatement = null;
 
@@ -579,6 +588,8 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             }
             connection.commit();
             connection.setAutoCommit(true);
+            statement.close();
+            return true;
         } catch (SQLException e) {
             //            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
             setErrorInfo(e);
@@ -589,9 +600,11 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                     setErrorInfo(ex);
                 }
             }
+            return false;
         } catch (ParseException ex) {
             //TODO
             Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
 //        finally {
 //            if (connection != null) {
@@ -615,6 +628,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
 //            System.out.println("Connceted to Oracle");
             Statement statement = connection.createStatement();
             System.out.println(statement.executeUpdate("delete from " + tableName + " where " + condition));
+            statement.close();
             return true;
         } catch (SQLException e) {
             //Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
@@ -667,6 +681,9 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 defaultTableModel.addRow(rowData);
             }
             tblContent.setModel(defaultTableModel);
+            if (statement != null) {
+                statement.close();
+            }
         } catch (SQLException e) {
             setErrorInfo(e);
             Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
@@ -696,7 +713,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 lblInfo.setText("A paper can be reviewd by at most 3 people.");
                 break;
             case 20002:
-                lblInfo.setText("Violation to the remote reference intergrity on delete or update");
+                lblInfo.setText("Violation to the remote reference intergrity");
                 break;
             case 20003:
                 lblInfo.setText("One corresponding author for each paper at max");
@@ -723,5 +740,6 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 lblInfo.setText("Something wrong, please try again latter. Error code:" + e.getErrorCode());
                 break;
         }
+        e.printStackTrace();
     }
 }

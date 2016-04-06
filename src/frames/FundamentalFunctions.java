@@ -27,13 +27,13 @@ public interface FundamentalFunctions {
      * {@code columns} or the columns in the table, if the {@code columns} is
      * null.
      */
-    public void insert(String[] values);
+    public boolean insert(String[] values);
 
     /**
      * This method is to update a record
      *
      */
-    public void update(String[][] updatedData);
+    public boolean update(String[][] updatedData);
 
     /**
      * This method is to delete the record(s) indicated by the @values

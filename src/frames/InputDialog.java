@@ -5,7 +5,6 @@
  */
 package frames;
 
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 
@@ -105,7 +104,6 @@ public class InputDialog extends javax.swing.JDialog {
 
     public String[] getValues() {
         int columnNumber = tblContent.getColumnCount();
-        System.out.println(columnNumber);
         String[] result = new String[columnNumber];
         for (int i = 0; i < columnNumber; i++) {
             result[i] = (String) tblContent.getModel().getValueAt(0, i);
