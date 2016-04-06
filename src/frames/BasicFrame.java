@@ -13,6 +13,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import oracle.jdbc.OracleDriver;
 
 /**
@@ -258,7 +262,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }// </editor-fold>//GEN-END:initComponents
     private void btnInsertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertActionPerformed
         // TODO add your handling code here:
-        InputDialog insertDialog = new InputDialog(this, "Insert for " + tableName, headers, PK_Number);
+        InputDialog insertDialog = new InputDialog(this, "Insert for " + tableName, headers);
         insertDialog.setVisible(true);
         insertDialog.addWindowListener(new WindowAdapter() {
             @Override
@@ -269,8 +273,6 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
         view();
     }//GEN-LAST:event_btnInsertActionPerformed
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        // TODO add your handling code here:
-
         //find selected rows
         int[] selectedRows = tblContent.getSelectedRows();
         Object[][] subTable = new Object[selectedRows.length][tblContent.getColumnCount()];
@@ -280,12 +282,12 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             }
         }
 
-        InputDialog updateDialog = new InputDialog(this, "Update for " + tableName, headers, subTable);
+        InputDialog updateDialog = new InputDialog(this, "Update for " + tableName, headers,PK_Number, subTable);
         updateDialog.setVisible(true);
         updateDialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-//                update(updateDialog.getValues());
+                update(updateDialog.getUpdatedData());
             }
         });
     }//GEN-LAST:event_btnUpdateActionPerformed
@@ -474,10 +476,7 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
     }
 
     @Override
-    public void update(String[] values, String[] columns, String condition) {
-        // might be new parameters list
-        Object[][] data;
-
+    public void update(Object[][] updatedData) {
         //try preparedStatement
         PreparedStatement preparedUpdateStatement = null;
 
@@ -491,7 +490,10 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             }
             updateSql.append(" ,");
         }
-
+        updateSql.append(" where ");
+        updateSql.append(getPKs());
+        
+        System.out.println(updateSql.toString());
         Connection connection = null;
         try {
             //link to db
@@ -506,32 +508,46 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
             //prepare statement
             System.out.println("Prepared sql:" + updateSql.toString());
             preparedUpdateStatement = connection.prepareStatement(updateSql.toString());
-
-            for (int i = 0; i < values.length; i++) {
-                switch (resultSetMetaData.getColumnType(i + 1)) {
-                    case 2:
-                        //NUMERIC
-
-                        break;
-                    case 12:
-                        //VARCHAR
-
-                        break;
-                    case 93:
-                        //DATE
-
-                        break;
-                    default:
-                        break;
+            for (int i = 0; i < updatedData.length; i++) {
+                //set values for each row
+                for (int j = 0; j < updatedData[0].length; j++) {
+                    Object cellData = updatedData[i][j];
+                    switch (resultSetMetaData.getColumnType(j + 1)) {
+                        case 2:
+                            //NUMERIC
+                            preparedUpdateStatement.setBigDecimal(j, (BigDecimal)cellData);
+                            break;
+                        case 12:
+                            //VARCHAR
+                            preparedUpdateStatement.setString(j, (String)cellData);
+                            break;
+                        case 93:
+                            //DATE
+                            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                            preparedUpdateStatement.setDate(j, new java.sql.Date(df.parse((String)cellData).getTime()));
+                            break;
+                        default:
+                            break;
+                    }
                 }
+                preparedUpdateStatement.executeUpdate();
+                connection.commit();
             }
-
-            String sql = "update " + tableName + " set " + " where ";
-            statement.executeUpdate("insert into " + tableName + " values(" + sb.toString() + ")");
-            System.out.println("executed sql:insert into " + tableName + " values(" + sb.toString() + ")");
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
 //            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, e);
             setErrorInfo(e);
+            if(connection!=null){
+                try{
+                    connection.rollback();
+                }
+                catch(SQLException ex){
+                    setErrorInfo(ex);
+                }
+            }
+        } catch (ParseException ex) {
+            //TODO
+            Logger.getLogger(BasicFrame.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (connection != null) {
                 try {
@@ -661,5 +677,6 @@ public class BasicFrame extends javax.swing.JFrame implements FundamentalFunctio
                 lblInfo.setText("Something wrong, please try again latter. Error code:" + e.getErrorCode());
                 break;
         }
+        System.err.println();
     }
 }

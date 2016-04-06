@@ -15,7 +15,7 @@ package frames;
 public interface FundamentalFunctions {
 
     /**
-     * This method is to view all the records if the 
+     * This method is to view all the records if the
      */
     public void view();
 
@@ -32,17 +32,8 @@ public interface FundamentalFunctions {
     /**
      * This method is to update a record
      *
-     * @param values The values that to be updated. Must match the indicated
-     * {@code columns} or the columns in the table, if the {@code columns} is
-     * null.
-     * @param columns The names of columns that to be updated. Being
-     * {@code null} indicates the update operation does not specific the columns
-     * to be updated.
-     * @param condition The where clause that to specify the row(s) to be
-     * indicated, excluded the word "where".
-     * @return True if the insert operation successful
      */
-    public void update(String[] values, String[] columns, String condition);
+    public void update(Object[][] updatedData);
 
     /**
      * This method is to delete the record(s) indicated by the @values

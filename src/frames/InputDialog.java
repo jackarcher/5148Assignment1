@@ -20,12 +20,11 @@ public class InputDialog extends javax.swing.JDialog {
     /**
      * Creates new form InputDialog
      */
-    public InputDialog(java.awt.Frame parent, String title, Object[] headers, int PK_Number) {
+    public InputDialog(java.awt.Frame parent, String title, Object[] headers) {
         super(parent, title);
         defaultTableModel = new DefaultTableModel(headers, 1) {
             @Override
             public boolean isCellEditable(int row, int column) {
-//                return column >= PK_Number;
                 return true;
             }
         };
@@ -33,12 +32,13 @@ public class InputDialog extends javax.swing.JDialog {
 
     }
 
-    public InputDialog(java.awt.Frame parent, String title, Object[] headers, Object[][] datas) {
+    public InputDialog(java.awt.Frame parent, String title, Object[] headers, int PK_Number, Object[][] datas) {
         super(parent, title);
         defaultTableModel = new DefaultTableModel(datas, headers) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return true;
+                return column >= PK_Number;
+//                return true;
             }
         };
         initComponents();
@@ -113,8 +113,14 @@ public class InputDialog extends javax.swing.JDialog {
         return result;
     }
 
-    public JTable getUpdatedTable() {
-        return tblContent;
+    public Object[][] getUpdatedData() {
+        Object[][] updatedData = new String[tblContent.getRowCount()][tblContent.getColumnCount()];
+        for (int i = 0; i < updatedData.length; i++) {
+            for (int j = 0; j < updatedData[0].length; j++) {
+                updatedData[i][j] = tblContent.getValueAt(i, j);
+            }
+        }
+        return updatedData;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSubmit;
